@@ -11,7 +11,8 @@
 <p>保存済みデータ: <span id="savedCount">0</span></p>
 <button onclick="startAuto()">開始</button>
 <button onclick="stopAuto()">停止</button>
-
+  
+<div id="board" style="display:grid; grid-template-columns:repeat(7,40px); gap:2px; margin:10px 0;"></div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 import { getDatabase, ref, push, get } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
@@ -47202,12 +47203,12 @@ function placeWordOnBoard(board, word, startIdx, dir){
   }
   return { newBoard, lastIdx };
 }
-
 function getValidMoves(board, lastIdx, lastChar, usedWords){
   const moves = [];
   const words = dictionaryHard[lastChar] || [];
   for(let w of words){
     if(usedWords.has(w)) continue;
+    if(!isHiraganaOnly(w)) continue;
     if(getLastChar(w) === "ん") continue;
     for(let d of Object.keys(dirSymbol)){
       const row = Math.floor(lastIdx/7);
@@ -47309,6 +47310,16 @@ async function runOneGame(){
       break;
     }
 
+// 盤面を表示
+const boardDiv = document.getElementById("board");
+boardDiv.innerHTML = "";
+for(let i = 0; i < 49; i++){
+  const cell = document.createElement("div");
+  cell.style.cssText = "width:40px; height:40px; border:1px solid black; display:flex; align-items:center; justify-content:center; font-size:14px;";
+  cell.textContent = board[i];
+  boardDiv.appendChild(cell);
+}
+    
     currentPlayer = currentPlayer === 0 ? 1 : 0;
   }
 
